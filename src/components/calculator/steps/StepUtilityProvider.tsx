@@ -7,10 +7,10 @@ import ProgressBar from '../ProgressBar';
 import IconCardGrid from '@/components/ui/IconCardGrid';
 import { getUtilityProvidersByState } from '@/lib/nrel';
 
-// Major US utility providers for fallback
+// Maine utility providers
 const DEFAULT_UTILITIES = [
-  { id: 'Central Maine Power', label: 'Central Maine Power', emoji: '⚡' },
-  { id: 'Emera', label: 'Emera Maine', emoji: '⚡' },
+  { id: 'Central Maine Power', label: 'Central Maine Power (CMP)', emoji: '⚡' },
+  { id: 'Versant Power', label: 'Versant Power', emoji: '⚡' },
   { id: 'Other', label: 'Other', emoji: '⚙️' },
 ];
 
