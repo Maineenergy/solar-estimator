@@ -50,9 +50,11 @@ export async function getUtilityProvidersByLocation(
           name: utility.utility_name || utility.name || 'Unknown Utility',
         })
       );
+
       utilities.push({ id: 'Other', name: 'Other' });
       return utilities;
     }
+
     return [{ id: 'Other', name: 'Other' }];
   } catch (error) {
     console.error('Error fetching NREL utility data:', error);
@@ -60,10 +62,14 @@ export async function getUtilityProvidersByLocation(
   }
 }
 
+/**
+ * Common utility providers for fallback purposes
+ * Maps state abbreviations to common utilities
+ */
 const UTILITY_MAP: Record<string, UtilityProvider[]> = {
   ME: [
-    { id: 'Central Maine Power', name: 'Central Maine Power' },
-    { id: 'Emera', name: 'Emera Maine' },
+    { id: 'Central Maine Power', name: 'Central Maine Power (CMP)' },
+    { id: 'Versant Power', name: 'Versant Power' },
     { id: 'Other', name: 'Other' },
   ],
   CA: [
@@ -91,6 +97,10 @@ const UTILITY_MAP: Record<string, UtilityProvider[]> = {
   ],
 };
 
+/**
+ * Get utility providers by state code (fallback)
+ * Used when NREL API is unavailable
+ */
 export function getUtilityProvidersByState(stateCode: string): UtilityProvider[] {
   return UTILITY_MAP[stateCode] || [{ id: 'Other', name: 'Other' }];
 }
