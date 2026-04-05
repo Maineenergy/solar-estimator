@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-orange: #F97316;
+}
+
+.btn-primary {
+  @apply bg-[#F97316] text-white font-semibold px-6 py-3 rounded-lg;
+}
+}
