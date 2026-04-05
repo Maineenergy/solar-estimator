@@ -4,9 +4,128 @@
 
 :root {
   --brand-orange: #F97316;
+  --brand-orange-hover: #EA6C0A;
+  --brand-orange-dark: #C2560A;
+  --brand-blue: #1E3A5F;
+  --brand-blue-light: #EBF4FF;
+  --brand-gray-bg: #EEF1F6;
+  --progress-green: #22C55E;
 }
 
-.btn-primary {
-  @apply bg-[#F97316] text-white font-semibold px-6 py-3 rounded-lg;
+* {
+  box-sizing: border-box;
 }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[#F97316] hover:bg-[#EA6C0A] active:bg-[#C2560A] text-white font-semibold
+           px-6 py-3 rounded-lg transition-colors duration-150 flex items-center justify-center gap-2
+           disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  .btn-back {
+    @apply text-gray-600 hover:text-gray-800 flex items-center gap-1.5 font-medium transition-colors;
+  }
+
+  .calculator-card {
+    @apply bg-white rounded-2xl shadow-xl px-6 py-8 sm:px-10 sm:py-10 w-full max-w-2xl mx-auto;
+  }
+
+  .step-title {
+    @apply text-[22px] sm:text-2xl font-bold text-gray-900 text-center mb-6 leading-snug;
+  }
+
+  .radio-option {
+    @apply flex items-center gap-3 border border-gray-200 rounded-xl px-5 py-4 cursor-pointer
+           hover:border-blue-400 hover:bg-blue-50 transition-all duration-150 select-none;
+  }
+
+  .radio-option.selected {
+    @apply border-blue-400 bg-blue-50;
+  }
+
+  .icon-card {
+    @apply flex flex-col items-center justify-center gap-2 border-2 border-gray-200 rounded-xl
+           p-4 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-150
+           select-none text-center;
+  }
+
+  .icon-card.selected {
+    @apply border-blue-400 bg-blue-50;
+  }
+
+  .input-field {
+    @apply w-full border border-gray-300 rounded-xl px-4 py-3.5 text-gray-900 placeholder-gray-400
+           focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:border-transparent
+           text-base transition-shadow;
+  }
+}
+
+.satellite-bg {
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #E5E7EB;
+  outline: none;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1D4ED8;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1D4ED8;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+.step-enter {
+  animation: fadeSlideIn 0.25s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spinner {
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
