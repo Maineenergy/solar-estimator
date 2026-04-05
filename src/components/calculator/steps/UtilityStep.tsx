@@ -2,43 +2,51 @@
 
 import { useCalculator } from '@/context/CalculatorContext';
 
-// Hardcoded fallback utilities — real app would fetch by zip
-const DEFAULT_UTILITIES = [
-  { id: 'OTHER', name: 'OTHER', logo: null },
-];
+interface Utility {
+  id: string;
+  name: string;
+  abbr: string;
+}
 
-// Utility logos are fetched dynamically in a real app.
-// This component renders logo tiles based on the zip code.
-function getUtilitiesForZip(zip: string) {
-  // Placeholder: show 2-3 example utilities based on region
-  // Replace with real API call in production
-  const ca = ['90210', '90001', '94102', '92101'];
-  const tx = ['78201', '75001', '77001'];
-  const ny = ['10001', '11001'];
+function getUtilitiesForZip(zip: string): Utility[] {
+  // Maine ZIP codes start with 039-049
+  if (zip.startsWith('04') || zip.startsWith('039')) {
+    return [
+      { id: 'Central Maine Power', name: 'Central Maine Power (CMP)', abbr: 'CMP' },
+      { id: 'Versant Power', name: 'Versant Power', abbr: 'VERSANT' },
+      { id: 'OTHER', name: 'Other', abbr: 'OTHER' },
+    ];
+  }
 
-  if (ca.includes(zip) || zip.startsWith('9')) {
+  // California
+  if (zip.startsWith('9')) {
     return [
       { id: 'LADWP', name: 'LADWP (City of Los Angeles)', abbr: 'LA DWP' },
       { id: 'SCE', name: 'Southern California Edison Co', abbr: 'SCE' },
-      { id: 'OTHER', name: 'OTHER', abbr: 'OTHER' },
+      { id: 'OTHER', name: 'Other', abbr: 'OTHER' },
     ];
   }
-  if (tx.includes(zip) || zip.startsWith('7')) {
+
+  // Texas
+  if (zip.startsWith('7')) {
     return [
       { id: 'ONCOR', name: 'Oncor Electric', abbr: 'ONCOR' },
       { id: 'RELIANT', name: 'Reliant Energy', abbr: 'RELIANT' },
-      { id: 'OTHER', name: 'OTHER', abbr: 'OTHER' },
+      { id: 'OTHER', name: 'Other', abbr: 'OTHER' },
     ];
   }
+
+  // Default — show CMP and Versant since this is a Maine-focused service
   return [
-    { id: 'LOCAL', name: 'Local Utility', abbr: 'LOCAL' },
-    { id: 'OTHER', name: 'OTHER', abbr: 'OTHER' },
+    { id: 'Central Maine Power', name: 'Central Maine Power (CMP)', abbr: 'CMP' },
+    { id: 'Versant Power', name: 'Versant Power', abbr: 'VERSANT' },
+    { id: 'OTHER', name: 'Other', abbr: 'OTHER' },
   ];
 }
 
 export default function UtilityStep() {
   const { data, updateData, setStep, goBack } = useCalculator();
-  const utilities = getUtilitiesForZip(data.zip);
+  const utilities = getUtilitiesForZip(data.zip || '');
 
   const handleSelect = (id: string, name: string) => {
     updateData({ utility: id, utilityLabel: name });
@@ -48,18 +56,18 @@ export default function UtilityStep() {
   return (
     <div className="step-enter">
       <h2 className="step-title">Select your utility provider</h2>
-
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2">
         {utilities.map((u) => (
           <button
             key={u.id}
             type="button"
             onClick={() => handleSelect(u.id, u.name)}
-            className={`flex flex-col items-center justify-center gap-3 border-2 rounded-xl p-5 cursor-pointer
-                        transition-all duration-150 hover:border-blue-400 hover:bg-blue-50
-                        ${data.utility === u.id ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-white'}`}
+            className={`flex flex-col items-center justify-center gap-3 border-2 rounded-xl p-5 cursor-pointer transition-all duration-150 hover:border-blue-400 hover:bg-blue-50 ${
+              data.utility === u.id
+                ? 'border-blue-400 bg-blue-50'
+                : 'border-gray-200 bg-white'
+            }`}
           >
-            {/* Logo placeholder — replace with <img> tags for actual logos */}
             {u.id === 'OTHER' ? (
               <div className="w-16 h-12 flex items-center justify-center">
                 <span className="text-2xl font-black text-gray-700">OTHER</span>
@@ -77,7 +85,6 @@ export default function UtilityStep() {
           </button>
         ))}
       </div>
-
       <div className="mt-6">
         <button type="button" onClick={goBack} className="btn-back">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
