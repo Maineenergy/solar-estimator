@@ -22,7 +22,7 @@ const AVERAGE_RATES: Record<string, number> = {
   AR: 12.0,
   AZ: 13.5,
   CA: 18.0,
-  Co: 13.0,
+  CO: 13.0,
   CT: 16.5,
   DE: 13.5,
   FL: 12.0,
@@ -33,7 +33,7 @@ const AVERAGE_RATES: Record<string, number> = {
   IL: 14.0,
   IN: 12.5,
   KS: 12.0,
-  Ky: 11.0,
+  KY: 11.0,
   LA: 11.0,
   MA: 15.5,
   MD: 14.5,
@@ -143,7 +143,7 @@ function getStateFromZip(zip: string): string {
   if (zipNum >= 30 && zipNum <= 31) return 'GA'; // 30000-31999
   if (zipNum >= 32 && zipNum <= 34) return 'FL'; // 32000-34999
   if (zipNum >= 35 && zipNum <= 36) return 'AL'; // 35000-36999
-  if (zipNum >= 37 && zipNum 7<= 38) return 'TN'; // 37000-38999
+  if (zipNum >= 37 && zipNum <= 38) return 'TN'; // 37000-38999
   if (zipNum >= 39 && zipNum <= 45) return 'OH'; // 39000-45999
   if (zipNum >= 46 && zipNum <= 47) return 'IN'; // 46000-47999
   if (zipNum >= 48 && zipNum <= 49) return 'MI'; // 48000-49999
@@ -193,34 +193,58 @@ export function calculateSolarEstimate(
   const sunHours = PEAK_SUN_HOURS[state] || 4.5;
 
   // Calculate annual kWh consumption
-  const monthlyKwh = (monthlyBill / (avgRate * 0.01)) || 800;
+  // monthlyBill ($/month) / (avgRate cents/kWh * 0.01) / 12 months = annual kWh
+  const monthlyKwh = (monthlyBill / (avgRate * 0.01)) || 800; // Safe fallback
   const annualKwh = monthlyKwh * 12;
 
   // Calculate system size (kW)
+  // annualKwh / sunHours / 365 days
   let systemSize = annualKwh / sunHours / 365;
+
+  // Round to nearest 0.5 kW
   systemSize = Math.round(systemSize * 2) / 2;
+
+  // Minimum system size
   if (systemSize < 3) systemSize = 3;
 
+  // Apply system type multiplier
+  // Solar with battery storage typically adds 20-30% to cost for the battery component
   let costMultiplier = 1.0;
-  if (systemType === 'Solar with battery storage') costMultiplier = 1.25;
+  if (systemType === 'Solar with battery storage') {
+    costMultiplier = 1.25;
+  }
 
+  // Calculate estimated cost
+  // National average: ~$2,800 per kW installed
   const costPerKw = 2800;
   const estimatedCost = systemSize * costPerKw * costMultiplier;
+
+  // Federal tax credit (30% of cost)
   const federalTaxCredit = estimatedCost * 0.3;
+
+  // Net cost after tax credit
   const estimatedNetCost = estimatedCost - federalTaxCredit;
+
+  // Annual savings
+  // Assuming 85% offset of electricity usage (conservative)
   const annualSavings = (monthlyBill * 12) * 0.85;
-  const paybackPeriod = estimatedNetCst > 0 ? estimatedNetCost / annualSavings : 0;
+
+  // Payback period in years
+  const paybackPeriod = estimatedNetCost > 0 ? estimatedNetCost / annualSavings : 0;
 
   return {
-    systemSize: Math.round(systemSize * 10) / 10,
+    systemSize: Math.round(systemSize * 10) / 10, // Round to 1 decimal
     estimatedCost: Math.round(estimatedCost),
     federalTaxCredit: Math.round(federalTaxCredit),
-    estimatedNetCst: Math.round(estimatedNetCost),
+    estimatedNetCost: Math.round(estimatedNetCost),
     annualSavings: Math.round(annualSavings),
-    paybackPeriod: Math.round(paybackPeriod * 10) / 10,
+    paybackPeriod: Math.round(paybackPeriod * 10) / 10, // Round to 1 decimal
   };
 }
 
+/**
+ * Format currency for display
+ */
 export function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
