@@ -65,7 +65,7 @@ export default function MarkerStep() {
 
     const map = new window.google.maps.Map(mapRef.current, {
       center,
-      zoom: 19,
+      zoom: 17,
       mapTypeId: 'satellite',
       tilt: 0,
       disableDefaultUI: true,
