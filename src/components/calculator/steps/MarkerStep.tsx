@@ -21,7 +21,8 @@ export default function MarkerStep() {
   const apiKey = GOOGLE_MAPS_CONFIG.apiKey;
 
   const mapRef = useRef<HTMLDivElement>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const markerRef = useRef<any>(null);
   const [markerLat, setMarkerLat] = useState(lat);
   const [markerLng, setMarkerLng] = useState(lng);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -66,37 +67,54 @@ export default function MarkerStep() {
     const map = new window.google.maps.Map(mapRef.current, {
       center,
       zoom: 17,
-      mapTypeId: 'satellite',
+      mapTypeId: 'hybrid',
       tilt: 0,
       disableDefaultUI: true,
       zoomControl: true,
-      gestureHandling: 'greedy',
-    });
-
-    const marker = new window.google.maps.Marker({
-      position: center,
-      map,
-      draggable: true,
-      title: 'Drag to your roof',
-      icon: {
-        path: window.google.maps.SymbolPath.CIRCLE,
-        scale: 10,
-        fillColor: '#EF4444',
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 2,
+      zoomControlOptions: {
+        position: window.google.maps.ControlPosition.LEFT_TOP,
       },
+      scrollwheel: false,
+      gestureHandling: 'cooperative',
     });
 
-    marker.addListener('dragend', () => {
-      const pos = marker.getPosition();
-      if (pos) {
-        setMarkerLat(pos.lat());
-        setMarkerLng(pos.lng());
-      }
-    });
+    // Use AdvancedMarkerElement if available (newer API), fall back to legacy Marker
+    let marker: google.maps.Marker | google.maps.marker.AdvancedMarkerElement;
+    if (window.google.maps.marker?.AdvancedMarkerElement) {
+      const adv = new window.google.maps.marker.AdvancedMarkerElement({
+        position: center,
+        map,
+        gmpDraggable: true,
+        title: 'Drag to your roof',
+      });
+      adv.addListener('dragend', (e: google.maps.MapMouseEvent) => {
+        const pos = (adv as google.maps.marker.AdvancedMarkerElement).position as google.maps.LatLng;
+        if (pos) { setMarkerLat(typeof pos.lat === 'function' ? pos.lat() : (pos as unknown as {lat: number}).lat); setMarkerLng(typeof pos.lng === 'function' ? pos.lng() : (pos as unknown as {lng: number}).lng); }
+      });
+      marker = adv;
+    } else {
+      const leg = new window.google.maps.Marker({
+        position: center,
+        map,
+        draggable: true,
+        title: 'Drag to your roof',
+        icon: {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillColor: '#EF4444',
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2,
+        },
+      });
+      leg.addListener('dragend', () => {
+        const pos = leg.getPosition();
+        if (pos) { setMarkerLat(pos.lat()); setMarkerLng(pos.lng()); }
+      });
+      marker = leg;
+    }
 
-    markerRef.current = marker;
+    markerRef.current = marker as google.maps.Marker;
     setMapLoaded(true);
   }
 
@@ -114,7 +132,7 @@ export default function MarkerStep() {
       {/* Map container */}
       <div
         className="relative rounded-xl overflow-hidden bg-gray-700 mt-2"
-        style={{ height: 280 }}
+        style={{ height: 384 }}
       >
         <div ref={mapRef} className="w-full h-full" />
 
