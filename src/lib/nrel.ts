@@ -43,6 +43,8 @@ export async function getUtilityProvidersByLocation(
 
     const data = await response.json();
 
+    // NREL API returns utility info in the response
+    // Structure depends on API version - this is a typical example
     if (data.utility && data.utility.utilities && Array.isArray(data.utility.utilities)) {
       const utilities: UtilityProvider[] = data.utility.utilities.map(
         (utility: any) => ({
@@ -51,10 +53,12 @@ export async function getUtilityProvidersByLocation(
         })
       );
 
+      // Always include "Other" as a fallback option
       utilities.push({ id: 'Other', name: 'Other' });
       return utilities;
     }
 
+    // Fallback if response structure is unexpected
     return [{ id: 'Other', name: 'Other' }];
   } catch (error) {
     console.error('Error fetching NREL utility data:', error);
