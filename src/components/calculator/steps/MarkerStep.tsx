@@ -8,7 +8,8 @@ import StepNav from '../StepNav';
 
 declare global {
   interface Window {
-    google: typeof google;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    google: any;
     initMarkerMap: () => void;
   }
 }
@@ -21,7 +22,8 @@ export default function MarkerStep() {
   const apiKey = GOOGLE_MAPS_CONFIG.apiKey;
 
   const mapRef = useRef<HTMLDivElement>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const markerRef = useRef<any>(null);
   const [markerLat, setMarkerLat] = useState(lat);
   const [markerLng, setMarkerLng] = useState(lng);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -73,7 +75,6 @@ export default function MarkerStep() {
       zoomControlOptions: {
         position: window.google.maps.ControlPosition.LEFT_TOP,
       },
-      scrollwheel: false,
       gestureHandling: 'cooperative',
     });
 
